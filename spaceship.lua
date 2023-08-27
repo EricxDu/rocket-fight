@@ -29,6 +29,7 @@ local spaceship = {
   angle = 0,
   turnrate = 2.5,
   speed = 25,
+  cooldown = 0
 }
 
 function spaceship:accelerate(dt)
@@ -43,22 +44,46 @@ function spaceship:new(o)
   return o
 end
 
+--[[
+    spaceship:nose
+    Return coordinates at forward edge of spaceship.
+    d == distance from center (optional)
+    x, y == relative offset from center (optional)
+--]]
 function spaceship:nose(d)
   d = d or self.radius
   return self.x + math.cos(self.angle) * d,
          self.y + math.sin(self.angle) * d
 end
 
+--[[
+    spaceship:rotate
+    Rotate ship clockwise or counterclockwise
+    dt == time elapsed (required)
+      positive number == clockwise
+      negative number == counterclockwise
+--]]
 function spaceship:rotate(dt)
   self.angle = self.angle + self.turnrate * dt
   self.angle = self.angle % (2 * math.pi)
 end
 
+--[[
+    spaceship:segment
+    Return current angle in degrees
+    n == use fewer or more segments (optional)
+--]]
 function spaceship:segment(n)
   n = n or 360
   return math.floor(self.angle * (n / 2 / math.pi))
 end
 
+--[[
+    spaceship:tail
+    Return coordinates at rear edge of spaceship.
+    d == distance from center (optional)
+    x, y == relative offset from center (optional)
+--]]
 function spaceship:tail(d, x, y)
   d = d or self.radius
   x = x or 0
@@ -67,6 +92,11 @@ function spaceship:tail(d, x, y)
          self.y - math.sin(self.angle) * d + y
 end
 
+--[[
+    spaceship:translate
+    Move the spaceship according to current delta velocity.
+    dt == time elapsed (required)
+--]]
 function spaceship:translate(dt)
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
