@@ -2,12 +2,10 @@ local joystick = {
   [0] = {},
   [1] = {},
   [2] = {},
-  [3] = {},
-  [4] = {}
+  [3] = {}
 }
 
 function love.joystickpressed(n, b)
-  n = n + 1
   if b == 0 then
     joystick[n].fire = true
   elseif b == 3 then
@@ -22,7 +20,6 @@ function love.joystickpressed(n, b)
 end
 
 function love.joystickreleased(n, b)
-  n = n + 1
   if b == 0 then
     joystick[n].fire = false
   elseif b == 3 then

@@ -37,6 +37,11 @@ function spaceship:accelerate(dt)
   self.dy = self.dy + math.sin(self.angle) * self.speed * dt
 end
 
+function spaceship:distance(obj)
+  local dx, dy = self.x - obj.x, self.y - obj.y
+  return math.sqrt(dx * dx + dy * dy)
+end
+
 function spaceship:new(o)
   o = o or {}
   setmetatable(o, self)
