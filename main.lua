@@ -12,11 +12,10 @@ wedge0 = love.graphics.newImage("images/wedge0.png")
 wedge1 = love.graphics.newImage("images/wedge1.png")
 wedge2 = love.graphics.newImage("images/wedge2.png")
 wedge3 = love.graphics.newQuad(0, 0, 32, 32, 256, 256)
-missle0 = love.graphics.newImage("images/missile0.png")
-missle1 = love.graphics.newQuad(0, 0, 16, 16, 256, 256)
-missle2 = love.graphics.newQuad(0, 0, 16, 16, 256, 256)
-missle3 = love.graphics.newQuad(0, 0, 16, 16, 256, 256)
-missle4 = love.graphics.newQuad(0, 0, 16, 16, 256, 256)
+missile0 = love.graphics.newImage("images/missile0.png")
+missile1 = love.graphics.newImage("images/missile1.png")
+missile2 = love.graphics.newImage("images/missile2.png")
+missile3 = love.graphics.newImage("images/missile3.png")
 asteroid0 = love.graphics.newImage("images/asteroid0.png")
 asteroid_large0 = love.graphics.newQuad(0, 0, 64, 64, 256, 256)
 asteroid_medium0 = love.graphics.newQuad(64, 0, 32, 32, 256, 256)
@@ -41,24 +40,46 @@ sprite_player1 = Sprite:new{
   wedge0, wedge3, tile_width = 32, tile_height = 32
 }
 sprite_missile0 = Sprite:new{
-  missle0,
-  love.graphics.newQuad(0, 0, 16, 16, 256, 256),
-  tile_width = 16, tile_height = 16
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
 }
 sprite_missile1 = Sprite:new{
-  missle0,
-  love.graphics.newQuad(0, 0, 16, 16, 256, 256),
-  tile_width = 16, tile_height = 16
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
 }
 sprite_missile2 = Sprite:new{
-  missle0,
-  love.graphics.newQuad(0, 0, 16, 16, 256, 256),
-  tile_width = 16, tile_height = 16
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
 }
 sprite_missile3 = Sprite:new{
-  missle0,
-  love.graphics.newQuad(0, 0, 16, 16, 256, 256),
-  tile_width = 16, tile_height = 16
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
+}
+sprite_missile4 = Sprite:new{
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
+}
+sprite_missile5 = Sprite:new{
+  missile3,
+  love.graphics.newQuad(0, 0, 16, 16, 128, 128),
+  texture_width = 128, texture_height = 128,
+  tile_width = 16, tile_height = 16,
+  animation = {[0] = missile0, missile1, missile2, missile3}
 }
 sprite_exhaust0 = Sprite:new{
   needle1, needle3,
@@ -89,6 +110,8 @@ global_sprites = {
   sprite_missile1,
   sprite_missile2,
   sprite_missile3,
+  sprite_missile4,
+  sprite_missile5,
   sprite_exhaust0,
   sprite_exhaust1,
   sprite_explosion0,
@@ -101,10 +124,12 @@ function love.load()
   }
   global_explosions = {}
   global_missiles = {
-    Missile:new{x=1000, y=1000, timer=0, sprite=sprite_missile0},
-    Missile:new{x=1000, y=1000, timer=0, sprite=sprite_missile1},
-    Missile:new{x=1000, y=1000, timer=0, sprite=sprite_missile2},
-    Missile:new{x=1000, y=1000, timer=0, sprite=sprite_missile3}
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile0},
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile1},
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile2},
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile3},
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile4},
+    Missile:new{x=1000, y=1000, life=0, sprite=sprite_missile5}
   }
   global_players = {
     Player:new{
@@ -126,11 +151,13 @@ function love.load()
   }
   global_players[1].missiles = {
     global_missiles[1],
-    global_missiles[2]
+    global_missiles[2],
+    global_missiles[3]
   }
   global_players[2].missiles = {
-    global_missiles[3],
-    global_missiles[4]
+    global_missiles[4],
+    global_missiles[5],
+    global_missiles[6]
   }
 end
 
@@ -142,37 +169,24 @@ function love.update(dt)
     asteroid.sprite:moveto(asteroid.x - 32, asteroid.y - 32)
   end
   for _, missile in ipairs(global_missiles) do
-    local anim = math.floor((2000 - missile.timer) / 64) * 64
-    if missile.timer > 1808 then
-      missile.timer = missile.timer - dt * 1000
-    elseif missile.timer > 0 then
-      missile:translate(dt)
-      missile.timer = missile.timer - dt * 1000
-    else
-      missile.x, missile.y = 1000, 1000
-    end
-    missile.sprite:moveto(missile.x - 8, missile.y - 8)
-    missile.sprite[2]:setViewport(
-      missile.sprite:get_tile(
-        missile:segment(64) + math.min(anim, 192)
-      )
-    )
+    missile:control(dt)
+    missile:animate(dt)
   end
-  for i, player in ipairs(global_players) do
+  for _, player in ipairs(global_players) do
     if player.cooldown > 0 then
       player.cooldown = player.cooldown - dt * 1000
     else
       player.cooldown = 0
     end
-    control(player, Joystick[i-1], dt)
+    control(player, player.joystick, dt)
     -- explode player if hit by missile
     for _, missile in ipairs(global_missiles) do
       if player:distance(missile) < player.radius + missile.radius then
-        missile.timer = 0
+        missile.life = 0
         player.killed = true
       end
     end
-    panimate(player, dt)
+    player:animate(dt)
   end
   table.insert(global_sprites, table.remove(global_sprites, 1))
 end
@@ -189,15 +203,10 @@ function control(player, joystick, dt)
     return
   end
   if joystick then
-    -- launch missiles if available
+    -- fire missiles if available
     if joystick.fire and player.cooldown == 0 then
       player.cooldown = 750
-      for _, missile in ipairs(player.missiles) do
-        if missile.timer <= 0 then
-          fire_missile(player, missile)
-          break
-        end
-      end
+      player:fire(player.missiles)
     end
     -- accelerate and show rocket fire
     if joystick.up then
@@ -215,35 +224,64 @@ function control(player, joystick, dt)
   end
 end
 
-function fire_missile(player, missile)
-  missile.x, missile.y = player:nose(24)
-  missile.angle = player.angle
-  missile.timer = 2000
+function Missile:animate(dt)
+  self.sprite:moveto(self.x - 8, self.y - 8)
+  self.fuse = math.min(2000 - self.life, 192)
+  self.sprite[1] = self.sprite.animation[
+    math.floor(self.fuse / 64)
+  ]
+  self.sprite[2]:setViewport(
+    self.sprite:get_tile(
+      self:segment(64)
+    )
+  )
 end
 
-function panimate(player, dt)
-  player:translate(dt)
-  player.sprite:moveto(player.x - 16, player.y - 16)
-  player.sprite[2]:setViewport(
-    player.sprite:get_tile(
-      player:segment(64)
+function Missile:control(dt)
+  if self.life > 0 then
+    self:translate(dt)
+    self.life = self.life - dt * 1000
+  else
+    self.life = 0
+    self.x, self.y = 1000, 1000
+  end
+end
+
+function Player:animate(dt)
+  self:translate(dt)
+  self.sprite:moveto(self.x - 16, self.y - 16)
+  self.sprite[2]:setViewport(
+    self.sprite:get_tile(
+      self:segment(64)
     )
   )
   -- animations to perform as player is killed
-  if player.killed then
-    local anim = math.floor(player.explosion.timer / 75) * 64
-    player.explosion[2]:setViewport(math.min(anim, 192), 0, 64, 64)
+  if self.killed then
+    local anim = math.floor(self.explosion.timer / 75) * 64
+    self.explosion[2]:setViewport(math.min(anim, 192), 0, 64, 64)
     if anim < 250 then
-      player.explosion:moveto(player.x - 32, player.y - 32)
+      self.explosion:moveto(self.x - 32, self.y - 32)
     else
-      player.explosion:moveto(1000, 1000)
+      self.explosion:moveto(1000, 1000)
     end
-    player.sprite:moveto(1000, 1000)
-    player.explosion.timer = player.explosion.timer + dt * 1000
+    self.sprite:moveto(1000, 1000)
+    self.explosion.timer = self.explosion.timer + dt * 1000
   else
-    player.explosion:moveto(1000, 1000)
+    self.explosion:moveto(1000, 1000)
   end
-  player.rocket[1] = player.rocket.animation[
+  self.rocket[1] = self.rocket.animation[
     math.floor(love.timer.getTime() * 10 % 2)
   ]
+end
+
+function Player:fire(missiles)
+  for _, missile in ipairs(missiles) do
+    if missile.life == 0 then
+      missile.x, missile.y = self:nose(24)
+      missile.dx, missile.dy = self.dx, self.dy
+      missile.angle = self.angle
+      missile.life = 2000
+      break
+    end
+  end
 end

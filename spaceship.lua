@@ -32,9 +32,10 @@ local spaceship = {
   cooldown = 0
 }
 
-function spaceship:accelerate(dt)
-  self.dx = self.dx + math.cos(self.angle) * self.speed * dt
-  self.dy = self.dy + math.sin(self.angle) * self.speed * dt
+function spaceship:accelerate(d)
+  d = d or 1
+  self.dx = self.dx + math.cos(self.angle) * self.speed * d
+  self.dy = self.dy + math.sin(self.angle) * self.speed * d
 end
 
 function spaceship:distance(obj)
@@ -83,12 +84,7 @@ function spaceship:segment(n)
   return math.floor(self.angle * (n / 2 / math.pi))
 end
 
---[[
-    spaceship:tail
-    Return coordinates at rear edge of spaceship.
-    d == distance from center (optional)
-    x, y == relative offset from center (optional)
---]]
+--[[ Return coordinates at rear edge of spaceship --]]
 function spaceship:tail(d, x, y)
   d = d or self.radius
   x = x or 0
@@ -97,11 +93,7 @@ function spaceship:tail(d, x, y)
          self.y - math.sin(self.angle) * d + y
 end
 
---[[
-    spaceship:translate
-    Move the spaceship according to current delta velocity.
-    dt == time elapsed (required)
---]]
+--[[ Move according to current delta velocity --]]
 function spaceship:translate(dt)
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
