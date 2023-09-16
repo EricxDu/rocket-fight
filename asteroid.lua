@@ -3,7 +3,7 @@ local asteroid = {
   bottom = 240,
   x = 0,
   y = 0,
-  radius = 64,
+  radius = 32,
   speed = 0
 }
 

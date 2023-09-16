@@ -159,6 +159,18 @@ function love.load()
     global_missiles[5],
     global_missiles[6]
   }
+  global_players[1].hazards = {
+    global_asteroids[1],
+    global_missiles[4],
+    global_missiles[5],
+    global_missiles[6]
+  }
+  global_players[2].hazards = {
+    global_asteroids[1],
+    global_missiles[1],
+    global_missiles[2],
+    global_missiles[3]
+  }
 end
 
 function love.update(dt)
@@ -179,10 +191,10 @@ function love.update(dt)
       player.cooldown = 0
     end
     control(player, player.joystick, dt)
-    -- explode player if hit by missile
-    for _, missile in ipairs(global_missiles) do
-      if player:distance(missile) < player.radius + missile.radius then
-        missile.life = 0
+    -- explode player if hit by hazard
+    for _, hazard in ipairs(player.hazards) do
+      if player:distance(hazard) < player.radius + hazard.radius then
+        hazard.life = 0
         player.killed = true
       end
     end
@@ -206,21 +218,21 @@ function control(player, joystick, dt)
     -- fire missiles if available
     if joystick.fire and player.cooldown == 0 then
       player.cooldown = 750
-      player:fire(player.missiles)
+      player:fire()
     end
     -- accelerate and show rocket fire
     if joystick.up then
-      player:accelerate(dt)
       player.rocket:moveto(player:tail(14, -16, -16))
     else
       player.rocket:moveto(1000, 1000)
     end
     -- rotate rocketship
-    if joystick.left then
-      player:rotate(-dt)
-    elseif joystick.right then
-      player:rotate(dt)
-    end
+    player:control{
+      up = joystick.up,
+      left = joystick.left,
+      right = joystick.right,
+      dt = dt
+    }
   end
 end
 
@@ -274,12 +286,13 @@ function Player:animate(dt)
   ]
 end
 
-function Player:fire(missiles)
-  for _, missile in ipairs(missiles) do
+function Player:fire()
+  for _, missile in ipairs(self.missiles) do
     if missile.life == 0 then
       missile.x, missile.y = self:nose(24)
       missile.dx, missile.dy = self.dx, self.dy
       missile.angle = self.angle
+      missile:accelerate(dt)
       missile.life = 2000
       break
     end

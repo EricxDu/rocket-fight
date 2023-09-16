@@ -19,23 +19,30 @@ Space*, and *Asteroids*.
 --]]
 
 local spaceship = {
-  right = 320,
-  bottom = 240,
   x = 0,
   y = 0,
   radius = 16,
   dx = 0,
   dy = 0,
   angle = 0,
-  turnrate = 2.5,
-  speed = 25,
   cooldown = 0
 }
 
-function spaceship:accelerate(d)
-  d = d or 1
-  self.dx = self.dx + math.cos(self.angle) * self.speed * d
-  self.dy = self.dy + math.sin(self.angle) * self.speed * d
+function spaceship:control(arg)
+  local dt = arg.dt or 1
+  local ship_speed = 50
+  local turn_speed = 5
+  if arg.left then
+    self.angle = self.angle - turn_speed * dt
+    self.angle = self.angle % (2 * math.pi)
+  elseif arg.right then
+    self.angle = self.angle + turn_speed * dt
+    self.angle = self.angle % (2 * math.pi)
+  end
+  if arg.up then
+    self.dx = self.dx + math.cos(self.angle) * ship_speed * dt
+    self.dy = self.dy + math.sin(self.angle) * ship_speed * dt
+  end
 end
 
 function spaceship:distance(obj)
@@ -63,18 +70,6 @@ function spaceship:nose(d)
 end
 
 --[[
-    spaceship:rotate
-    Rotate ship clockwise or counterclockwise
-    dt == time elapsed (required)
-      positive number == clockwise
-      negative number == counterclockwise
---]]
-function spaceship:rotate(dt)
-  self.angle = self.angle + self.turnrate * dt
-  self.angle = self.angle % (2 * math.pi)
-end
-
---[[
     spaceship:segment
     Return current angle in degrees
     n == use fewer or more segments (optional)
@@ -95,10 +90,11 @@ end
 
 --[[ Move according to current delta velocity --]]
 function spaceship:translate(dt)
+  local right, bottom = 320, 240
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
-  self.x = (self.x+self.radius) % (self.right+self.radius*2) - self.radius
-  self.y = (self.y+self.radius) % (self.bottom+self.radius*2) - self.radius
+  self.x = (self.x + self.radius) % (right + self.radius * 2) - self.radius
+  self.y = (self.y + self.radius) % (bottom + self.radius * 2) - self.radius
 end
 
 return spaceship
