@@ -7,7 +7,8 @@ local missile = {
   dy = 0,
   radius = 5,
   angle = 0,
-  speed = 100
+  speed = 100,
+  timer0 = 0
 }
 
 function missile:accelerate(d)
@@ -28,7 +29,7 @@ function missile:segment(n)
   return math.floor(self.angle * (n / 2 / math.pi))
 end
 
-function missile:translate(dt)
+function missile:update(dt)
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
 --  self.x = self.x + math.cos(self.angle) * self.speed * dt
