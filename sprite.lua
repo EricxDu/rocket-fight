@@ -1,5 +1,5 @@
 --[[
-Copyright 2023 Eric Duhamel
+Copyright 2023 Eric Abides
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,9 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
---]]
 
---[[
 "sprite.lua" is a data structure meant for use with the
 "love.graphics.draw" function. Arguments for "draw" are stored
 sequentially.
@@ -37,8 +35,8 @@ local sprite = {
 }
 
 function sprite:moveto(x, y)
-  self[3] = x
-  self[4] = y
+  self[3] = x - self.tile_width
+  self[4] = y - self.tile_height
 end
 
 function sprite:new(o)

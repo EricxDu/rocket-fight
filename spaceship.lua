@@ -1,5 +1,5 @@
 --[[
-Copyright 2023 Eric Duhamel
+Copyright 2023 Eric Abides
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,9 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
---]]
 
---[[
 "spaceship.lua" is a physics library for managing a rocketship akin to
 the original *Spacewar!* and derivatives like *Galaxy Game*, *Computer
 Space*, and *Asteroids*.
@@ -27,7 +25,7 @@ local spaceship = {
   dy = 0,
   angle = 0,
   cooldown = 0,
-  radius = 15,
+  radius = 10,
   timer0 = 0
 }
 
@@ -51,7 +49,7 @@ function spaceship:distance(obj)
   return math.sqrt(dx * dx + dy * dy)
 end
 
-function spaceship:fire0()
+function spaceship:new_missile()
   if self.timer0 == 0 then
     self.timer0 = 0.75
     local o = {
